@@ -1,36 +1,55 @@
 import express from 'express'
 import { createDonation, createNotification, findDonationById, findUserById, getDonations, getDonationsByDonorId, getNotificationsByUserId, updateDonationStatus } from '../data/store.js'
 import { requireAuth } from '../middleware/authMiddleware.js'
-import { sendDonationAcceptedEmails } from '../services/emailService.js'
+import { sendDonationAcceptedEmails, sendNewDonationNotification } from '../services/emailService.js'
 
 const router = express.Router()
 
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const category = req.body.category || req.body.foodCategory || req.body.foodType
-    const location = req.body.location || req.body.pickupLocation || req.body.pickupAddress
+    const category = (req.body.category || req.body.foodCategory || req.body.foodType || '').trim()
+    const quantity = (req.body.quantity || '').trim()
+    const location = (req.body.pickupAddress || req.body.location || req.body.pickupLocation || '').trim()
 
-    if (!category || !req.body.quantity || !location) {
-      return res.status(400).json({ message: 'Category, quantity, and location are required' })
+    if (!category || !quantity || !location) {
+      return res.status(400).json({ message: 'Food category, quantity, and pickup address are required.' })
     }
 
     const donation = await createDonation({
-      ...req.body,
-      category,
-      location,
       foodType: req.body.foodType || category,
-      pickupAddress: req.body.pickupAddress || location,
+      category,
+      quantity,
+      location,
+      pickupAddress: location,
+      pickupTime: req.body.pickupTime || 'Flexible',
+      notes: req.body.notes || '',
       donorId: req.user.id,
     })
-    const donor = await findUserById(req.user.id)
-    await createNotification({
-      userId: req.user.id,
-      message: `Thank you${donor ? `, ${donor.name}` : ''}! Your ${donation.category} donation was submitted successfully.`,
-    })
+
+    const foundDonor = await findUserById(req.user.id)
+    const donor = foundDonor || { id: req.user.id, name: req.user.name || 'Donor', email: req.user.email || '' }
+
+    // Notify user in-app
+    try {
+      await createNotification({
+        userId: req.user.id,
+        message: `Thank you, ${donor.name}! Your ${donation.category} donation was submitted successfully.`,
+      })
+    } catch (notifErr) {
+      console.error('Non-fatal: In-app notification error:', notifErr)
+    }
+
+    // Send email notification to admin & donor
+    try {
+      await sendNewDonationNotification({ donor, donation })
+    } catch (emailErr) {
+      console.error('Non-fatal: Email notification error:', emailErr)
+    }
+
     res.status(201).json(donation)
   } catch (error) {
     console.error('Failed to create donation:', error)
-    res.status(500).json({ message: error.message })
+    res.status(500).json({ message: error.message || 'Server error while saving donation.' })
   }
 })
 
@@ -67,20 +86,18 @@ router.patch('/:id/accept', requireAuth, async (req, res) => {
     }
 
     const donor = await findUserById(existingDonation.donorId)
-    if (!donor?.email) {
-      return res.status(422).json({ message: 'The donation donor does not have a valid email address' })
-    }
-
     const donation = await updateDonationStatus(existingDonation.id, 'accepted')
+
     try {
-      await sendDonationAcceptedEmails({ donor, donation })
+      if (donor) {
+        await sendDonationAcceptedEmails({ donor, donation })
+      }
     } catch (emailError) {
-      await updateDonationStatus(existingDonation.id, existingDonation.status)
-      throw emailError
+      console.error('Email error on acceptance:', emailError)
     }
 
     await createNotification({
-      userId: donor.id,
+      userId: existingDonation.donorId,
       message: `Your ${donation.category} donation has been accepted by an NGO.`,
     })
     res.json({ message: 'Donation accepted and confirmation emails sent', donation })

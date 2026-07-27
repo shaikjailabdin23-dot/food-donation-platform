@@ -15,24 +15,24 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-            <p className="mb-4 inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">Food rescue made simple</p>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl">Turn surplus meals into hope for the people who need them most.</h1>
-            <p className="mt-6 max-w-2xl text-lg text-slate-600">FoodBridge helps donors, NGOs, and community organizers coordinate food rescue efficiently and responsibly.</p>
+            <p className="mb-4 inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border dark:border-emerald-800">Food rescue made simple</p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl dark:text-slate-50">Turn surplus meals into hope for the people who need them most.</h1>
+            <p className="mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-300">FoodBridge helps donors, NGOs, and community organizers coordinate food rescue efficiently and responsibly.</p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-emerald-700">Get started <FiArrowRight /></Link>
-              <Link to="/available-donations" className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:border-emerald-500 hover:text-emerald-600">Browse donations</Link>
+              <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600">Get started <FiArrowRight /></Link>
+              <Link to="/available-donations" className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:border-emerald-500 hover:text-emerald-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-400">Browse donations</Link>
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl">
-            <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-lime-500 p-8 text-white">
-              <p className="text-sm uppercase tracking-[0.3em]">Live impact</p>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl transition dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-2xl bg-gradient-to-br from-emerald-600 to-lime-600 p-8 text-white shadow-lg dark:from-emerald-700 dark:to-lime-700">
+              <p className="text-sm uppercase tracking-[0.3em] text-emerald-100">Live impact</p>
               <p className="mt-3 text-3xl font-semibold">12k+ meals shared this month</p>
               <p className="mt-4 text-sm text-emerald-50">Trusted by restaurants, hotels, organizers, and NGOs across the city.</p>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {['320 NGOs', '1.8k donors', '97% pickup success'].map((item) => (
-                <div key={item} className="rounded-2xl bg-slate-50 p-4 text-center text-sm font-medium text-slate-700">{item}</div>
+                <div key={item} className="rounded-2xl bg-slate-50 p-4 text-center text-sm font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">{item}</div>
               ))}
             </div>
           </motion.div>
@@ -44,10 +44,10 @@ export default function Home() {
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <div key={feature.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="inline-flex rounded-2xl bg-emerald-100 p-3 text-emerald-600"><Icon size={22} /></div>
-                <h3 className="mt-4 text-xl font-semibold text-slate-900">{feature.title}</h3>
-                <p className="mt-2 text-slate-600">{feature.text}</p>
+              <div key={feature.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition dark:border-slate-800 dark:bg-slate-900">
+                <div className="inline-flex rounded-2xl bg-emerald-100 p-3 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"><Icon size={22} /></div>
+                <h3 className="mt-4 text-xl font-semibold text-slate-900 dark:text-slate-100">{feature.title}</h3>
+                <p className="mt-2 text-slate-600 dark:text-slate-400">{feature.text}</p>
               </div>
             )
           })}
